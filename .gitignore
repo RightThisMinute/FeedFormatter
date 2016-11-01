@@ -1,0 +1,10 @@
+# Xcode
+*.xcodeproj/*
+
+# Swift Package Manager
+Packages/
+.build/
+
+# Project
+config.yaml
+logs/*
