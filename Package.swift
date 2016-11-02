@@ -5,6 +5,10 @@ let package = Package(
     dependencies: [
       .Package(url: "https://github.com/Zewo/Axis.git",
                majorVersion: 0, minor: 14),
+      .Package(url: "https://github.com/IBM-Swift/BlueSignals.git",
+               majorVersion: 0, minor: 9),
+      .Package(url: "https://github.com/RightThisMinute/CommandLine.git",
+               majorVersion: 3, minor: 0),
       .Package(url: "https://github.com/Zewo/File.git",
                majorVersion: 0, minor: 14),
       .Package(url: "https://github.com/Zewo/HTTP.git",
