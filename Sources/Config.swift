@@ -6,14 +6,21 @@
 //
 //
 
+import Foundation
 import File
 import Mapper
 import Yaml
 
 
 struct Config {
+	/// Directory the config lives in.
+	let directory: String
 	let server: ServerConfig
+	
 	let feeds: [FeedConfig]
+	let feedDefaults: FeedConfigDefaults
+	
+	let templatesDir: String
 	
 	enum Error : Swift.Error {
 		case unexpectedEncoding(String)
@@ -23,12 +30,17 @@ struct Config {
 
 extension Config : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case server, feeds
+		case directory, server, feed_defaults, feeds, templates_dir
 	}
 	
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
+		directory = try mapper.map(from: .directory)
 		server = try mapper.map(from: .server)
 		feeds  = try mapper.map(from: .feeds)
+		feedDefaults = try mapper.map(from: .feed_defaults)
+		
+		let dir: String = try mapper.map(from: .templates_dir)
+		templatesDir = File.resolve(path: dir, relativeTo: directory)
 	}
 
 	init(path: String) throws {
@@ -40,7 +52,8 @@ extension Config : InMappable {
 			throw Config.Error.unexpectedEncoding("Config file not UTF8 encoded.")
 		}
 		
-		let yaml = try YAML.load(rawYAML)
+		var yaml = try YAML.load(rawYAML)
+		yaml["directory"] = YAML.string(File.parent(of: path))
 		
 		try self.init(mapper: InMapper(of: yaml))
 	}
@@ -62,16 +75,42 @@ extension ServerConfig : InMappable {
 }
 
 
+struct FeedConfigDefaults {
+	let link: String
+	let template: String
+}
+
+extension FeedConfigDefaults : InMappable {
+	enum MappingKeys : String, Mapper.IndexPathElement {
+		case link, template
+	}
+
+	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
+		link = try mapper.map(from: .link)
+		template = try mapper.map(from: .template)
+	}
+}
+
+
 struct FeedConfig {
 	let id: String
 	let title: String
+	
 	let provider: Provider
 	let providerID: String
+	var providerURL: URL? {
+		return provider.url(for: providerID)
+	}
+	
 	let template: String
 }
 
 enum Provider : String {
 	case JW = "jw"
+	
+	func url(for id: String) -> URL? {
+		return URL(string: "https://content.jwplatform.com/feeds/\(id).json")
+	}
 }
 
 extension FeedConfig : InMappable {

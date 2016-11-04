@@ -8,3 +8,4 @@ Packages/
 # Project
 config.yaml
 logs/*
+templates/*
