@@ -1,0 +1,25 @@
+# All relative paths use the config file's location as their root.
+
+server:
+  port: 8080
+
+# Directory to look for templates in.
+templates_dir: templates
+
+# Any of these properties can be specified for a feed to override these
+# defaults.
+feed_defaults:
+  # <link> value.
+  link: "http://www.rightthisminute.com"
+  # Name of the template in `template_dir` to use for this feed.
+  template: default.mrss.xml
+
+feeds:
+    # Used in the URL.
+  - id: 1234-abc
+    # Feed <title>
+    title: RTM Partner MRSS Feed
+    # See the `Provider` enum.
+    provider: jw
+    # The ID of the feed at the provider.
+    provider_id: t5t9CjMF
