@@ -85,12 +85,12 @@ extension JWSource : InMappable {
 	}
 	
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
-		label = try? mapper.map(from: .label)
-		type = try mapper.map(from: .type)
-		file = try mapper.map(from: .file)
-		width = try? mapper.map(from: .width)
-		height = try? mapper.unsafe_map(from: .height)
-		duration = try? mapper.unsafe_map(from: .duration)
+		label    = try? mapper.map(from: .label)
+		type     = try  mapper.map(from: .type)
+		file     = try  mapper.map(from: .file)
+		width    = try? mapper.map(from: .width)
+		height   = try? mapper.map(from: .height)
+		duration = try? mapper.map(from: .duration)
 	}
 	
 }
