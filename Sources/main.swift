@@ -1,9 +1,11 @@
 
 import Axis
+import File
 import Foundation
-import Mapper
-import HTTPServer
 import HTTPClient
+import HTTPServer
+import Mapper
+import MuttonChop
 
 
 let cli = CLI()
@@ -50,16 +52,72 @@ let router = BasicRouter { route in
 			                body: "Failed retreiving data from provider.")
 		}
 		
-		let body = try response.body.becomeBuffer(deadline: 30.seconds)
+		let feed: JWFeed
 		
-		guard let map = try JSONMapParser().parse(body) else {
-			return Response(status: .badGateway,
-			                body: "Unexpected data structure from provider.")
+		do {
+  		let body = try response.body.becomeBuffer(deadline: 30.seconds)
+			
+  		guard let map = try JSONMapParser().parse(body) else {
+  			return Response(status: .badGateway,
+  			                body: "Unexpected data structure from provider.")
+  		}
+  		
+  		feed = try JWFeed(mapper: InMapper(of: map))
 		}
 		
-		let feed = try JWFeed(mapper: InMapper(of: map))
+		let template: Template
 		
-		return Response(body: "Hello, \(url)!")
+		do {
+  		let name = feedConfig.template ?? config.feedDefaults.template
+  		let file = try File(path: config.templatesDir + "/" + name)
+  		let buffer = try file.readAll(deadline: 30.seconds)
+			file.close()
+			
+			guard let string = String(bytes: buffer.bytes, encoding: .utf8) else {
+				log.error("Template \(file) could not be converted to string.")
+				return Response(status: .internalServerError,
+				                body: "Failed loading template.")
+			}
+			
+			template = try Template(string)
+		}
+		
+		let playlist: [MuttonChop.Context] = feed.playlist.map { item in
+			let source = item.sources
+				.filter({ $0.type == "video/mp4" })
+				.sorted(by: { ($0.width ?? 0) > ($1.width ?? 0) })
+				.first
+			
+			let pubdate = item.pubdate.asString(
+				with: "yyyy-MM-dd'T'HH:mm:ssX"
+			)
+			
+			return [
+				"mediaID": .string(item.mediaID),
+				"title": .string(item.title),
+				"description": .string(item.description ?? ""),
+				"pubdate": .string(pubdate),
+				"source": [
+					"url": .string(source?.file.absoluteString ?? ""),
+					"type": .string(source?.type ?? ""),
+					"duration": .int(Int(source?.duration ?? 0)),
+				],
+				"thumbnail": .string(item.image.absoluteString),
+				"link": .string(item.link.absoluteString)
+			]
+		}
+		
+		let context: MuttonChop.Context = [
+			"title": .string(feedConfig.title),
+			"playlist": .array(playlist)
+		]
+		
+		let body = template.render(with: context)
+		let headers: Headers = [
+			"Content-Type": "application/rss+xml; charset=utf-8"
+		]
+		
+		return Response(headers: headers, body: body)
 	}
 }
 

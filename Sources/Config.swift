@@ -102,7 +102,7 @@ struct FeedConfig {
 		return provider.url(for: providerID)
 	}
 	
-	let template: String
+	let template: String?
 }
 
 enum Provider : String {
@@ -123,6 +123,6 @@ extension FeedConfig : InMappable {
 		title = try mapper.map(from: .title)
 		provider = try mapper.map(from: .provider)
 		providerID = try mapper.map(from: .provider_id)
-		template = (try? mapper.map(from: .template_path)) ?? "default"
+		template = try? mapper.map(from: .template_path)
 	}
 }
