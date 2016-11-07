@@ -20,7 +20,11 @@ extension Date : BasicInMappable {
 
 extension URL : BasicInMappable {
 	public init<Source : InMap>(mapper: BasicInMapper<Source>) throws {
-		let string: String = try mapper.map()
+		var string: String = try mapper.map()
+		
+		if string.hasPrefix("//") {
+			string = "https:\(string)"
+		}
 		
 		guard let url = URL(string: string) else {
 			throw InMapperError.cannotInitializeFromRawValue(string)
