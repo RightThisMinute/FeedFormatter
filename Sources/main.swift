@@ -93,17 +93,17 @@ let router = BasicRouter { route in
 			)
 			
 			return [
-				"mediaID": .string(item.mediaID),
-				"title": .string(item.title),
+				"mediaID":     .string(item.mediaID),
+				"title":       .string(item.title),
 				"description": .string(item.description ?? ""),
-				"pubdate": .string(pubdate),
+				"pubdate":     .string(pubdate),
 				"source": [
-					"url": .string(source?.file.absoluteString ?? ""),
-					"type": .string(source?.type ?? ""),
+					"url":      .string(source?.file.absoluteString ?? ""),
+					"type":     .string(source?.type ?? ""),
 					"duration": .int(Int(source?.duration ?? 0)),
 				],
 				"thumbnail": .string(item.image.absoluteString),
-				"link": .string(item.link.absoluteString)
+				"link":      .string(item.link.absoluteString)
 			]
 		}
 		
@@ -121,6 +121,6 @@ let router = BasicRouter { route in
 	}
 }
 
-let server = try Server(port: 8080, middleware: [LogMiddleware()],
-                        responder: router)
+let server = try Server(port: Int(config.server.port),
+                        middleware: [LogMiddleware()], responder: router)
 try server.start()
