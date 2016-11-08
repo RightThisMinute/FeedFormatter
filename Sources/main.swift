@@ -114,6 +114,7 @@ let router = BasicRouter { route in
 		
 		let context: MuttonChop.Context = [
 			"title": .string(feedConfig.title),
+			"link": .string(feedConfig.link ?? config.feedDefaults.link),
 			"playlist": .array(playlist)
 		]
 		
