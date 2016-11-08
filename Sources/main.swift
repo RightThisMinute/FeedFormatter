@@ -92,6 +92,10 @@ let router = BasicRouter { route in
 				with: "yyyy-MM-dd'T'HH:mm:ssX"
 			)
 			
+			let custom: [String: Map] = item.custom.map{ (key, value) in
+				return (key, .string(value))
+			}
+			
 			return [
 				"mediaID":     .string(item.mediaID),
 				"title":       .string(item.title),
@@ -103,7 +107,8 @@ let router = BasicRouter { route in
 					"duration": .int(Int(source?.duration ?? 0)),
 				],
 				"thumbnail": .string(item.image.absoluteString),
-				"link":      .string(item.link.absoluteString)
+				"link":      .string(item.link.absoluteString),
+				"custom":    .dictionary(custom),
 			]
 		}
 		
