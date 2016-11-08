@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:media="http://search.yahoo.com/mrss/"
+                   xmlns:dcterms="http://purl.org/dc/terms/"
+                   xmlns:fh="http://purl.org/syndication/history/1.0">
+<channel>
+  <title>{{ title }}</title>
+  <description></description>
+  <link>{{ link }}</link>
+  {{# playlist }}
+    <item>
+      <title>{{ title }}</title>
+      <description>{{ description }}</description>
+      <guid isPermaLink="false">{{ mediaID }}</guid>
+      <media:title>{{ title }}</media:title>
+      <media:description>{{ description }}</media:description>
+      <media:categories>{{ custom.categories  }}</media:categories>
+      <media:tags>{{ custom.tags }}</media:tags>
+      <media:keywords>{{ custom.tags }}</media:keywords>
+      <link>{{ source.url }}</link>
+      <media:content url="{{ source.url }}"
+                     duration="{{ source.duration }}"
+                     type="video/mp4">
+      </media:content>
+      <thumbnail-url>{{ thumbnail }}</thumbnail-url>
+      <pubDate>{{ pubdate }}</pubDate>
+    </item>
+{{/ playlist }}
+</channel>
+</rss>

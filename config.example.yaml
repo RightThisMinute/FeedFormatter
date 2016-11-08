@@ -4,15 +4,15 @@ server:
   port: 8080
 
 # Directory to look for templates in.
-templates_dir: templates
+templates_dir: ./
 
 # Any of these properties can be specified for a feed to override these
 # defaults.
 feed_defaults:
   # <link> value.
-  link: "http://www.rightthisminute.com"
+  link: "http://www.example.com"
   # Name of the template in `template_dir` to use for this feed.
-  template: default.mrss.xml
+  template: example.mrss.xml
 
 feeds:
     # Used in the URL.
