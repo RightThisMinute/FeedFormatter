@@ -18,7 +18,9 @@ feeds:
     # Used in the URL.
   - id: 1234-abc
     # Feed <title>
-    title: RTM Partner MRSS Feed
+    title: Partner MRSS Feed
+    # Feed <description> (optional)
+    description: Pug forage shabby chic, scenester craft beer single-origin coffee roof party brunch portland normcore.
     # See the `Provider` enum.
     provider: jw
     # The ID of the feed at the provider.

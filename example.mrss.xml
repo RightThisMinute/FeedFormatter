@@ -24,6 +24,6 @@
       <thumbnail-url>{{ thumbnail }}</thumbnail-url>
       <pubDate>{{ pubdate }}</pubDate>
     </item>
-{{/ playlist }}
+  {{/ playlist }}
 </channel>
 </rss>

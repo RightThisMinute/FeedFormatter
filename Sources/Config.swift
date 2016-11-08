@@ -95,6 +95,7 @@ extension FeedConfigDefaults : InMappable {
 struct FeedConfig {
 	let id: String
 	let title: String
+	let description: String?
 	let link: String?
 	
 	let provider: Provider
@@ -116,12 +117,13 @@ enum Provider : String {
 
 extension FeedConfig : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case id, title, link, provider, provider_id, template_path
+		case id, title, description, link, provider, provider_id, template_path
 	}
 	
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
 		id = try mapper.map(from: .id)
 		title = try mapper.map(from: .title)
+		description = try? mapper.map(from: .description)
 		link = try? mapper.map(from: .link)
 		provider = try mapper.map(from: .provider)
 		providerID = try mapper.map(from: .provider_id)
