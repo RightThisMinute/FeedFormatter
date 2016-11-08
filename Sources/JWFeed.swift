@@ -6,6 +6,7 @@
 //
 //
 
+import Axis
 import Foundation
 import Mapper
 
@@ -19,7 +20,7 @@ struct JWFeed {
 
 extension JWFeed : InMappable {
 	
-	enum MappingKeys : String, IndexPathElement {
+	enum MappingKeys : String, Mapper.IndexPathElement {
 		case kind, feedid, playlist, title
 	}
 	
@@ -48,7 +49,7 @@ struct JWItem {
 
 extension JWItem : InMappable {
 	
-	enum MappingKeys : String, IndexPathElement {
+	enum MappingKeys : String, Mapper.IndexPathElement {
 		case mediaid, title, description, pubdate, sources, duration, image,
 		     tracks, tags, link, custom
 	}
@@ -64,7 +65,19 @@ extension JWItem : InMappable {
 		tracks = try mapper.map(from: .tracks)
 		tags = (try mapper.map(from: .tags) as String).split(separator: ",")
 		link = try mapper.map(from: .link)
-		custom = try mapper.map(from: .custom) 
+		
+		var custom = [String: String]()
+		
+		if let source = mapper.source as? Map,
+		   case .dictionary(let dict) = source["custom"] {
+			
+			for (key, value) in dict {
+				let value = BasicInMapper(of: value)
+				custom[key] = (try? value.map()) ?? ""
+			}
+		}
+		
+		self.custom = custom
 	}
 }
 
@@ -80,7 +93,7 @@ struct JWSource {
 
 extension JWSource : InMappable {
 	
-	enum MappingKeys : String, IndexPathElement {
+	enum MappingKeys : String, Mapper.IndexPathElement {
 		case label, type, file, width, height, duration
 	}
 	
@@ -103,7 +116,7 @@ struct JWTrack {
 
 extension JWTrack : InMappable {
 	
-	enum MappingKeys : String, IndexPathElement {
+	enum MappingKeys : String, Mapper.IndexPathElement {
 		case kind, file
 	}
 	
