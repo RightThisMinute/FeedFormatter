@@ -117,7 +117,7 @@ enum Provider : String {
 
 extension FeedConfig : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case id, title, description, link, provider, provider_id, template_path
+		case id, title, description, link, provider, provider_id, template
 	}
 	
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
@@ -127,6 +127,6 @@ extension FeedConfig : InMappable {
 		link = try? mapper.map(from: .link)
 		provider = try mapper.map(from: .provider)
 		providerID = try mapper.map(from: .provider_id)
-		template = try? mapper.map(from: .template_path)
+		template = try? mapper.map(from: .template)
 	}
 }
