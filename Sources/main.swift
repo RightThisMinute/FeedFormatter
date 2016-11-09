@@ -12,6 +12,7 @@ let cli = CLI()
 let logAppender = LogAppender("Main", levels: [.all])
 let log = Logger(name: "Main", appenders: [logAppender])
 let config: Config
+var httpClients = [String: Client]()
 
 do {
 	config = try Config(path: cli.configPath)
@@ -38,10 +39,33 @@ let router = BasicRouter { route in
 			return Response(status: .internalServerError,
 			                body: "Failed generating provider URL.")
 		}
+		
+		let client: Client
+		var response: Response
 
-		let client = try Client(url: url)
-		var response = try client.get(url.absoluteString,
-		                              middleware: [LogMiddleware()])
+		do {
+			guard let host = url.host else {
+				log.error("URL has not host [\(url)].")
+				return Response(status: .internalServerError,
+				                body: "Provider URL missing host.")
+			}
+			
+			if let cachedClient = httpClients[host] {
+				client = cachedClient
+			} else {
+				client = try Client(url: url)
+				httpClients[host] = client
+			}
+			
+			response = try client.get(url.absoluteString)
+			
+		} catch {
+			log.error("Failed making request [GET \(url.absoluteString)].",
+			          error: error)
+			
+			return Response(status: .badGateway,
+			                body: "Failed retreiving data from provider.")
+		}
 
 		guard response.statusCode == 200 else {
 			log.error("Unexpected response \(response.status) from provider \(feedConfig.provider) with URL \(url.absoluteString).")
