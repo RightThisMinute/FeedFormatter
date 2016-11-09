@@ -15,11 +15,24 @@ let config: Config
 var httpClients = [String: Client]()
 
 do {
+	log.info("Reading config...")
 	config = try Config(path: cli.configPath)
+	
+	if let lockFilePath = config.lockFilePath {
+		log.info("Checking for lock file at [\(lockFilePath)].")
+		guard !File.fileExists(path: lockFilePath) else {
+			log.info("...already exists. Quitting.")
+			exit(EXIT_SUCCESS)
+		}
+		
+		log.info("...does not exist. Creating.")
+		try File(path: lockFilePath, mode: .createWrite).close()
+	}
+	
 	log.debug(config)
 
 } catch {
-	log.error("Failed initializing config.", error: error)
+	log.error("Failed initializing.", error: error)
 	exit(EXIT_FAILURE)
 }
 

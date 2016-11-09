@@ -15,6 +15,7 @@ import Yaml
 struct Config {
 	/// Directory the config lives in.
 	let directory: String
+	let lockFilePath: String?
 	let server: ServerConfig
 	
 	let feeds: [FeedConfig]
@@ -30,11 +31,19 @@ struct Config {
 
 extension Config : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case directory, server, feed_defaults, feeds, templates_dir
+		case directory, lock_file_path, server, feed_defaults, feeds,
+		     templates_dir
 	}
 	
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
 		directory = try mapper.map(from: .directory)
+		
+		if let path: String = try? mapper.map(from: .lock_file_path) {
+			lockFilePath = File.resolve(path: path, relativeTo: directory)
+		} else {
+			lockFilePath = nil
+		}
+		
 		server = try mapper.map(from: .server)
 		feeds  = try mapper.map(from: .feeds)
 		feedDefaults = try mapper.map(from: .feed_defaults)

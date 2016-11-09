@@ -1,5 +1,9 @@
 # All relative paths use the config file's location as their root.
 
+# Where to put the lock file. The application will quit immediatley after
+# parsing the config if it already exists. (optional)
+lock_file_path: running.lock
+
 server:
   port: 8080
 
