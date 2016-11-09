@@ -66,18 +66,15 @@ extension JWItem : InMappable {
 		tags = (try mapper.map(from: .tags) as String).split(separator: ",")
 		link = try mapper.map(from: .link)
 		
-		var custom = [String: String]()
-		
-		if let source = mapper.source as? Map,
-		   case .dictionary(let dict) = source["custom"] {
-			
-			for (key, value) in dict {
-				let value = BasicInMapper(of: value)
-				custom[key] = (try? value.map()) ?? ""
+		if let dict: [String: Map] = try? mapper.unsafe_map(from: .custom) {
+			custom = dict.map{ (key, value) in
+				let value = (try? BasicInMapper(of: value).map()) ?? ""
+				return (key, value)
 			}
+			
+		} else {
+			custom = [String: String]()
 		}
-		
-		self.custom = custom
 	}
 }
 
