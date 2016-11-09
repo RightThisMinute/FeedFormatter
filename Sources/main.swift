@@ -16,10 +16,10 @@ var httpClients = [String: Client]()
 
 do {
 	config = try Config(path: cli.configPath)
-	debugPrint(config)
+	log.debug(config)
 
 } catch {
-	debugPrint("danger danger", error)
+	log.error("Failed initializing config.", error: error)
 	exit(EXIT_FAILURE)
 }
 
@@ -87,6 +87,14 @@ let router = BasicRouter { route in
   		}
 
   		feed = try JWFeed(mapper: InMapper(of: map))
+			
+		} catch let error as JSONMapParserError {
+			log.error("Failed parsing JSON response from provider.",
+			          error: error)
+			log.debug(response)
+			
+			return Response(status: .internalServerError,
+			                body: "The provider gave an unexpected response.")
 		}
 
 		let template: Template
@@ -104,6 +112,13 @@ let router = BasicRouter { route in
 			}
 
 			template = try Template(string)
+			
+		} catch {
+			log.error("Failed reading and parsing template.", error: error)
+			log.debug(feedConfig)
+			
+			return Response(status: .internalServerError,
+			                body: "Failed parsing feed template.")
 		}
 
 		let playlist: [MuttonChop.Context] = feed.playlist.map { item in
@@ -164,6 +179,11 @@ let router = BasicRouter { route in
 	}
 }
 
-let server = try Server(port: Int(config.server.port),
-                        middleware: [LogMiddleware()], responder: router)
-try server.start()
+do {
+	let server = try Server(port: Int(config.server.port), responder: router)
+	try server.start()
+
+} catch {
+	log.error("Failed initializaing or starting server.", error: error)
+	exit(EXIT_FAILURE)
+}
