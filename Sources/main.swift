@@ -91,20 +91,36 @@ let router = BasicRouter { route in
 			let custom: [String: Map] = item.custom.map{ (key, value) in
 				return (key, .string(value))
 			}
-			
+
+			let source = item.sources
+				.filter({ $0.type == "video/mp4" })
+				.sorted(by: { ($0.width ?? 0) > ($1.width ?? 0) })
+				.first
+
+			var sourceFile: [String: Map] = [
+				"url":      .string(source?.file.absoluteString ?? ""),
+				"type":     .string(source?.type ?? ""),
+				"duration": .int(Int(source?.duration ?? 0)),
+			]
+
+			/// For some reason, putting these two values in the dictionary
+			/// literal that initializes `sourceFile` causes compliation to freeze
+			/// in Xcode and to take ~225 seconds building via the command line.
+			/// Assigning these values afterwards completely avoids the issue.
+			///
+			/// This was found with Xcode 8.1 and Swift 3.0 release.
+			sourceFile["width"]  = .int(Int(source?.width ?? 0))
+			sourceFile["height"] = .int(Int(source?.height ?? 0))
+
 			return [
 				"mediaID":     .string(item.mediaID),
 				"title":       .string(item.title),
 				"description": .string(item.description ?? ""),
 				"pubdate":     .string(pubdate),
-				"source": [
-					"url":      .string(source?.file.absoluteString ?? ""),
-					"type":     .string(source?.type ?? ""),
-					"duration": .int(Int(source?.duration ?? 0)),
-				],
-				"thumbnail": .string(item.image.absoluteString),
-				"link":      .string(item.link.absoluteString),
-				"custom":    .dictionary(custom),
+				"source":			 .dictionary(sourceFile),
+				"thumbnail":   .string(item.image.absoluteString),
+				"link":        .string(item.link.absoluteString),
+				"custom":      .dictionary(custom),
 			]
 		}
 
