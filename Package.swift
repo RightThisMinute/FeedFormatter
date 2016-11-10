@@ -23,5 +23,7 @@ let package = Package(
                majorVersion: 0, minor: 2),
       .Package(url: "https://github.com/behrang/YamlSwift.git",
                majorVersion: 3, minor: 0),
+      .Package(url: "https://github.com/RightThisMinute/YAMLMapper.git",
+               majorVersion: 0, minor: 1),
     ]
 )
