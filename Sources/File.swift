@@ -22,9 +22,11 @@ extension File {
 	/// - returns:
 	///		The absolute file system path.
 	
-	public static func resolve(path: String, relativeTo: String = "/")
+	public static func resolve(path: String, relativeTo: String? = nil)
 		-> String
 	{
+		let relativeTo = relativeTo ?? File.workingDirectory
+		
 		if (path.characters.count == 0 || [".", "./"].contains(path)) {
 			return relativeTo
 		}
