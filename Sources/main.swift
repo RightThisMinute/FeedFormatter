@@ -6,6 +6,7 @@ import HTTPClient
 import HTTPServer
 import Mapper
 import MuttonChop
+import Signals
 
 
 let cli = CLI()
@@ -35,6 +36,27 @@ do {
 	log.error("Failed initializing.", error: error)
 	exit(EXIT_FAILURE)
 }
+
+
+func cleanup() {
+	guard let lockFilePath = config.lockFilePath else { return; }
+	
+	log.info("Removing lock file [\(lockFilePath)].")
+	do {
+		try File.removeFile(path: lockFilePath)
+	} catch {
+		log.error("Failed removing lock file [\(lockFilePath)]", error: error)
+	}
+}
+
+defer { cleanup() }
+
+Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
+	log.info("Received [\(sig)] signal. Cleaning up.")
+	cleanup()
+	exit(sig)
+}
+
 
 let router = BasicRouter { route in
 	route.get("/feeds/:id") { request in
@@ -198,5 +220,6 @@ do {
 
 } catch {
 	log.error("Failed initializaing or starting server.", error: error)
+	cleanup()
 	exit(EXIT_FAILURE)
 }
