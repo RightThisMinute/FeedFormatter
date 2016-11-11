@@ -17,16 +17,14 @@ extension File {
 	///
 	/// - parameters:
 	///		+ path: A file system path (can be absolute).
-	///		+ relativeTo: The base used if `path` is relative. A common value is
-	///		  `File.workingDirectory()`.
+	///		+ relativeTo: The base used if `path` is relative..
 	/// - returns:
 	///		The absolute file system path.
 	
-	public static func resolve(path: String, relativeTo: String? = nil)
+	public static func resolve(path: String,
+	                           relativeTo: String = File.workingDirectory)
 		-> String
 	{
-		let relativeTo = relativeTo ?? File.workingDirectory
-		
 		if (path.characters.count == 0 || [".", "./"].contains(path)) {
 			return relativeTo
 		}
