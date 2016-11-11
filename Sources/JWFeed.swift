@@ -67,11 +67,7 @@ extension JWItem : InMappable {
 		link = try mapper.map(from: .link)
 		
 		if let dict: [String: Map] = try? mapper.unsafe_map(from: .custom) {
-			custom = dict.map{ (key, value) in
-				let value = (try? BasicInMapper(of: value).map()) ?? ""
-				return (key, value)
-			}
-			
+			custom = dict.map{ (k, v) in return (k, (try? v.get()) ?? "") }
 		} else {
 			custom = [String: String]()
 		}
