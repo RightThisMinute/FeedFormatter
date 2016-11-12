@@ -29,7 +29,7 @@ struct CLI {
 			
 		} catch {
 			parser.printUsage(error)
-			exit(EX_USAGE)
+			exit(EXIT_FAILURE)
 		}
 		
 		self.configPath = configPath.value!
