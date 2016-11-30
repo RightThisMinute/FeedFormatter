@@ -144,7 +144,9 @@ let router = BasicRouter { route in
 		let playlist: [MuttonChop.Context] = feed.playlist.map { item in
 
 			let pubdate = item.pubdate.asString(
-				with: "yyyy-MM-dd'T'HH:mm:ssZ"
+				/// [ISO 8601](https://www.w3.org/TR/NOTE-datetime) compatible
+				/// for easier parsing by clients.
+				with: "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
 			)
 
 			let custom: [String: Map] = item.custom.map{ (key, value) in
