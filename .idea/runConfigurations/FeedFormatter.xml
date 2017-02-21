@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="FeedFormatter" type="AppleRunConfiguration" factoryName="Application" singleton="true" PROGRAM_PARAMS="--config config.yaml" WORKING_DIR="file://$PROJECT_DIR$" PASS_PARENT_ENVS_2="true" PROJECT_NAME="FeedFormatter" TARGET_NAME="FeedFormatter" CONFIG_NAME="Debug" SCHEME_NAME="FeedFormatter" RUN_TARGET_PROJECT_NAME="FeedFormatter" RUN_TARGET_NAME="FeedFormatter" MAKE_ACTIVE="TRUE">
+    <envs />
+    <EXTENSION ID="org.jetbrains.appcode.reveal.RevealRunConfigurationExtension">
+      <REVEAL_SETTINGS autoInject="false" autoInstall="true" askToEnableAutoInstall="true" />
+    </EXTENSION>
+    <method />
+  </configuration>
+</component>
