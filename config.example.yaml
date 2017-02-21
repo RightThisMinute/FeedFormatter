@@ -4,6 +4,11 @@
 # parsing the config if it already exists. (optional)
 lock_file_path: running.lock
 
+# Where to log to. Everything except for the initialization messages will be
+# logged here instead of out put. If not set or set to `null`, log messages
+# will be sent to standard out.
+log_file_path:  logs/run.log
+
 server:
   port: 8080
 

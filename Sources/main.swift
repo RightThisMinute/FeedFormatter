@@ -10,29 +10,44 @@ import Signals
 
 
 let cli = CLI()
-let logAppender = LogAppender("Main", levels: [.all])
-let log = Logger(name: "Main", appenders: [logAppender])
+let log: Logger
 let config: Config
 
+let initLogAppender = LogAppender("Init", levels: [.all])
+let initLog = Logger(name: "Init", appenders: [initLogAppender])
+
 do {
-	log.info("Reading config...")
+	initLog.info("Reading config...")
 	config = try Config(path: cli.configPath)
-	
+
 	if let lockFilePath = config.lockFilePath {
-		log.info("Checking for lock file at [\(lockFilePath)].")
+		initLog.info("Checking for lock file at [\(lockFilePath)].")
 		guard !File.fileExists(path: lockFilePath) else {
-			log.info("...already exists. Quitting.")
+			initLog.info("...already exists. Quitting.")
 			exit(EXIT_SUCCESS)
 		}
-		
-		log.info("...does not exist. Creating.")
+
+		initLog.info("...does not exist. Creating.")
 		try File(path: lockFilePath, mode: .createWrite).close()
 	}
-	
-	log.debug(config)
+
+	initLog.debug(config)
+
+	let logFile: File?
+	if let path = config.logFilePath {
+		logFile = try File(path: path, mode: .appendWrite)
+		initLog.info("Logging to [\(path)].")
+	} else {
+		logFile = nil
+	}
+
+	let appender = LogAppender("Main", levels: [.all], file: logFile)
+	log = Logger(name: "Main", appenders: [appender])
+
+	log.info("Initialized.")
 
 } catch {
-	log.error("Failed initializing.", error: error)
+	initLog.error("Failed initializing.", error: error)
 	exit(EXIT_FAILURE)
 }
 
@@ -77,6 +92,7 @@ let router = BasicRouter { route in
 		var response: Response
 
 		do {
+			log.debug("[GET \(url.absoluteString)]")
 			response = try Client(url: url).get(url.absoluteString)
 			
 		} catch {
@@ -84,7 +100,7 @@ let router = BasicRouter { route in
 			          error: error)
 			
 			return Response(status: .badGateway,
-			                body: "Failed retreiving data from provider.")
+			                body: "Failed retrieving data from provider.")
 		}
 
 		guard response.statusCode == 200 else {
@@ -93,7 +109,7 @@ let router = BasicRouter { route in
 			log.debug(response)
 
 			return Response(status: .badGateway,
-			                body: "Failed retreiving data from provider.")
+			                body: "Failed retrieving data from provider.")
 		}
 
 		let feed: JWFeed
