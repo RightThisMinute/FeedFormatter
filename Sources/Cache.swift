@@ -27,6 +27,15 @@ final class Cache<Payload> {
 	}
 
 	func set(_ key: String, to payload: Payload) {
-		boxes[key] = (expires: Date() + maxAge, payload: payload)
+		let now = Date().timeIntervalSince1970
+
+		var expires = now + maxAge
+		expires -= expires.truncatingRemainder(dividingBy: maxAge)
+		if expires < now {
+			expires += maxAge
+		}
+
+		boxes[key] = (expires: Date(timeIntervalSince1970: expires),
+		              payload: payload)
 	}
 }
