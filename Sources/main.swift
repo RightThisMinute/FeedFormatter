@@ -6,6 +6,7 @@ import HTTPClient
 import HTTPServer
 import Mapper
 import MuttonChop
+import POSIX
 import Signals
 
 
@@ -114,9 +115,9 @@ let router = BasicRouter { route in
 		}
 
 		if let cache = responseCache {
-			let getFresh = request.url.queryItems.reduce(false) { _, item in
-				return item.name == "fresh" && item.value == "1"
-			}
+			let pattern = try Regex("(^|&)fresh=1(&|$)")
+			let getFresh =
+				request.url.query != nil && request.url.query!.matches(pattern)
 
 			if getFresh {
 				log.debug("\(req)fresh version requested, skipping cache.")

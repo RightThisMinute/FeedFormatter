@@ -19,6 +19,8 @@ let package = Package(
                majorVersion: 0, minor: 14),
       .Package(url: "https://github.com/Zewo/Mapper.git",
                majorVersion: 0, minor: 14),
+      .Package(url: "https://github.com/Zewo/POSIX.git",
+               majorVersion: 0, minor: 14),
       .Package(url: "https://github.com/Danappelxx/MuttonChop.git",
                majorVersion: 0, minor: 2),
       .Package(url: "https://github.com/behrang/YamlSwift.git",
