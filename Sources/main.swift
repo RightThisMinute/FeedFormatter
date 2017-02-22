@@ -73,25 +73,31 @@ Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
 
 
 let router = BasicRouter { route in
+
+	var counter = 0
+
 	route.get("/feeds/:id") { request in
 
-		log.debug("Handling request for [\(request.method) \(request.url.absoluteString)]...")
+		counter += 1
+		let req = "[\(counter)] "
+
+		log.debug("Handling request \(req)for [\(request.method) \(request.url.absoluteString)]...")
 		log.trace(request)
 
 		guard let id = request.pathParameters["id"] else {
-			log.debug("...missing feed ID parameter.")
+			log.debug("\(req)missing feed ID parameter.")
 			return Response(status: .unprocessableEntity,
 			                body: "Feed ID missing.")
   	}
 
 		guard let feedConfig = config.feeds.filter({ $0.id == id }).first else {
-			log.debug("...unknown feed ID.")
+			log.debug("\(req)unknown feed ID.")
 			return Response(status: .notFound,
 			                body: "No feed with ID \(id) found.")
 		}
 
 		guard let url = feedConfig.providerURL else {
-			log.debug("...failed generating provider URL.")
+			log.debug("\(req)failed generating provider URL.")
 			return Response(status: .internalServerError,
 			                body: "Failed generating provider URL.")
 		}
@@ -99,7 +105,7 @@ let router = BasicRouter { route in
 		var response: Response
 
 		do {
-			log.debug("...requesting feed from provider: [GET \(url.absoluteString)]")
+			log.debug("\(req)requesting feed from provider: [GET \(url.absoluteString)]")
 			response = try Client(url: url).get(url.absoluteString)
 			
 		} catch {
@@ -145,14 +151,14 @@ let router = BasicRouter { route in
 		let template: Template
 
 		do {
-			log.debug("...loading template.")
+			log.debug("\(req)loading template.")
 
   		let name = feedConfig.template ?? config.feedDefaults.template
   		let file = try File(path: config.templatesDir + "/" + name)
   		let buffer = try file.readAll(deadline: 30.seconds)
 			file.close()
 
-			log.trace("...template name: \(name)")
+			log.trace("\(req)template name: \(name)")
 
 			guard let string = String(bytes: buffer.bytes, encoding: .utf8) else {
 				log.error("Template \(name) could not be converted to string.")
@@ -170,7 +176,7 @@ let router = BasicRouter { route in
 			                body: "Failed parsing feed template.")
 		}
 
-		log.debug("...building template context.")
+		log.debug("\(req)building template context.")
 
 		let playlist: [MuttonChop.Context] = feed.playlist.map { item in
 
@@ -228,7 +234,7 @@ let router = BasicRouter { route in
 			"Content-Type": "application/rss+xml; charset=utf-8"
 		]
 
-		log.debug("...responding with rendered template.")
+		log.debug("\(req)responding with rendered template.")
 
 		return Response(headers: headers, body: body)
 	}
