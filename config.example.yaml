@@ -9,6 +9,9 @@ lock_file_path: running.lock
 # will be sent to standard out.
 log_file_path:  logs/run.log
 
+# Maximum age of cached responses. If not set, responses will not be cached.
+response_cache_max_age: 30 # minutes
+
 server:
   port: 8080
 

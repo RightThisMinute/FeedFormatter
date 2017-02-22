@@ -72,6 +72,15 @@ Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
 }
 
 
+let responseCache: Cache<Response>?
+
+if let maxAge = config.responseCacheMaxAge {
+	responseCache = Cache<Response>(maxAge: maxAge)
+} else {
+	responseCache = nil
+}
+
+
 let router = BasicRouter { route in
 
 	var counter = 0
@@ -81,7 +90,9 @@ let router = BasicRouter { route in
 		counter += 1
 		let req = "[\(counter)] "
 
-		log.debug("Handling request \(req)for [\(request.method) \(request.url.absoluteString)]...")
+		let cacheKey = "\(request.method) \(request.url.absoluteString)"
+
+		log.debug("Handling request \(req)for [\(cacheKey)]...")
 		log.trace(request)
 
 		guard let id = request.pathParameters["id"] else {
@@ -101,12 +112,24 @@ let router = BasicRouter { route in
 			return Response(status: .internalServerError,
 			                body: "Failed generating provider URL.")
 		}
-		
-		var response: Response
+
+		if let cache = responseCache {
+			log.debug("\(req)looking in cache.")
+
+			if let response = cache.get(cacheKey) {
+				log.debug("\(req)delivering cached response.")
+				return response
+			}
+
+			log.debug("\(req)not found in cache.")
+		}
+
+
+		var providerResponse: Response
 
 		do {
 			log.debug("\(req)requesting feed from provider: [GET \(url.absoluteString)]")
-			response = try Client(url: url).get(url.absoluteString)
+			providerResponse = try Client(url: url).get(url.absoluteString)
 			
 		} catch {
 			log.error("Failed making request [GET \(url.absoluteString)].",
@@ -116,10 +139,10 @@ let router = BasicRouter { route in
 			                body: "Failed retrieving data from provider.")
 		}
 
-		guard response.statusCode == 200 else {
-			log.error("Unexpected response \(response.status) from provider \(feedConfig.provider) with URL \(url.absoluteString).")
+		guard providerResponse.statusCode == 200 else {
+			log.error("Unexpected response \(providerResponse.status) from provider \(feedConfig.provider) with URL \(url.absoluteString).")
 			log.debug(feedConfig)
-			log.debug(response)
+			log.debug(providerResponse)
 
 			return Response(status: .badGateway,
 			                body: "Failed retrieving data from provider.")
@@ -128,7 +151,7 @@ let router = BasicRouter { route in
 		let feed: JWFeed
 
 		do {
-  		let body = try response.body.becomeBuffer(deadline: 5.seconds)
+  		let body = try providerResponse.body.becomeBuffer(deadline: 5.seconds)
 
   		guard let map = try JSONMapParser().parse(body) else {
 			  log.error("Unexpected data structure from provider.")
@@ -142,7 +165,7 @@ let router = BasicRouter { route in
 		} catch let error as JSONMapParserError {
 			log.error("Failed parsing JSON response from provider.",
 			          error: error)
-			log.debug(response)
+			log.debug(providerResponse)
 
 			return Response(status: .internalServerError,
 			                body: "The provider gave an unexpected response.")
@@ -235,8 +258,13 @@ let router = BasicRouter { route in
 		]
 
 		log.debug("\(req)responding with rendered template.")
+		let response = Response(headers: headers, body: body)
 
-		return Response(headers: headers, body: body)
+		if let cache = responseCache {
+			log.debug("\(req)caching response.")
+			cache.set(cacheKey, to: response)
+		}
+		return response
 	}
 }
 

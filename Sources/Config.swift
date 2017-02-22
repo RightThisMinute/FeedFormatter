@@ -18,6 +18,7 @@ struct Config {
 	let directory: String
 	let lockFilePath: String?
 	let logFilePath: String?
+	let responseCacheMaxAge: Double?
 	let server: ServerConfig
 
 	let feeds: [FeedConfig]
@@ -33,8 +34,8 @@ struct Config {
 
 extension Config : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case directory, lock_file_path, log_file_path, server, feed_defaults,
-		     feeds, templates_dir
+		case directory, lock_file_path, log_file_path, response_cache_max_age,
+		     server, feed_defaults, feeds, templates_dir
 	}
 
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
@@ -50,6 +51,12 @@ extension Config : InMappable {
 			logFilePath = File.resolve(path: path, relativeTo: directory)
 		} else {
 			logFilePath = nil
+		}
+
+		if let maxAge: Int = try? mapper.map(from: .response_cache_max_age) {
+			responseCacheMaxAge = maxAge.minutes
+		} else {
+			responseCacheMaxAge = nil
 		}
 
 		server = try mapper.map(from: .server)
