@@ -75,7 +75,7 @@ Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
 let router = BasicRouter { route in
 	route.get("/feeds/:id") { request in
 
-		log.debug("Handling request for [\(request.method) \(request.url)]...")
+		log.debug("Handling request for [\(request.method) \(request.url.absoluteString)]...")
 		log.trace(request)
 
 		guard let id = request.pathParameters["id"] else {
