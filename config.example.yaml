@@ -10,9 +10,7 @@ lock_file_path: running.lock
 log_file_path:  logs/run.log
 
 # Maximum age of cached responses. If not set, responses will not be cached.
-# This works a bit like cron: instead of expiring a cache X minutes after it
-# was set, the cache expires at the next Xth minute after it was set.
-response_cache_max_age: 30 # every 30th minute.
+response_cache_max_age: 30 # minutes.
 
 server:
   port: 8080
