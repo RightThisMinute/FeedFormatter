@@ -90,7 +90,7 @@ let router = BasicRouter { route in
 		counter += 1
 		let req = "[\(counter)] "
 
-		let cacheKey = "\(request.method) \(request.url.absoluteString)"
+		let cacheKey = "\(request.method) \(request.url.path)"
 
 		log.debug("Handling request \(req)for [\(cacheKey)]...")
 		log.trace(request)
@@ -114,14 +114,23 @@ let router = BasicRouter { route in
 		}
 
 		if let cache = responseCache {
-			log.debug("\(req)looking in cache.")
-
-			if let response = cache.get(cacheKey) {
-				log.debug("\(req)delivering cached response.")
-				return response
+			let getFresh = request.url.queryItems.reduce(false) { _, item in
+				return item.name == "fresh" && item.value == "1"
 			}
 
-			log.debug("\(req)not found in cache.")
+			if getFresh {
+				log.debug("\(req)fresh version requested, skipping cache.")
+
+			} else {
+				log.debug("\(req)looking in cache.")
+
+				if let response = cache.get(cacheKey) {
+					log.debug("\(req)delivering cached response.")
+					return response
+				}
+
+				log.debug("\(req)not found in cache.")
+			}
 		}
 
 
