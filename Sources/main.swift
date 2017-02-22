@@ -74,17 +74,24 @@ Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
 
 let router = BasicRouter { route in
 	route.get("/feeds/:id") { request in
+
+		log.debug("Handling request for [\(request.method) \(request.url)]...")
+		log.trace(request)
+
 		guard let id = request.pathParameters["id"] else {
+			log.debug("...missing feed ID parameter.")
 			return Response(status: .unprocessableEntity,
 			                body: "Feed ID missing.")
   	}
 
 		guard let feedConfig = config.feeds.filter({ $0.id == id }).first else {
+			log.debug("...unknown feed ID.")
 			return Response(status: .notFound,
 			                body: "No feed with ID \(id) found.")
 		}
 
 		guard let url = feedConfig.providerURL else {
+			log.debug("...failed generating provider URL.")
 			return Response(status: .internalServerError,
 			                body: "Failed generating provider URL.")
 		}
@@ -92,7 +99,7 @@ let router = BasicRouter { route in
 		var response: Response
 
 		do {
-			log.debug("[GET \(url.absoluteString)]")
+			log.debug("...requesting feed from provider: [GET \(url.absoluteString)]")
 			response = try Client(url: url).get(url.absoluteString)
 			
 		} catch {
@@ -115,9 +122,11 @@ let router = BasicRouter { route in
 		let feed: JWFeed
 
 		do {
-  		let body = try response.body.becomeBuffer(deadline: 30.seconds)
+  		let body = try response.body.becomeBuffer(deadline: 5.seconds)
 
   		guard let map = try JSONMapParser().parse(body) else {
+			  log.error("Unexpected data structure from provider.")
+			  log.debug(try String(buffer: body))
   			return Response(status: .badGateway,
   			                body: "Unexpected data structure from provider.")
   		}
@@ -128,7 +137,7 @@ let router = BasicRouter { route in
 			log.error("Failed parsing JSON response from provider.",
 			          error: error)
 			log.debug(response)
-			
+
 			return Response(status: .internalServerError,
 			                body: "The provider gave an unexpected response.")
 		}
@@ -136,13 +145,17 @@ let router = BasicRouter { route in
 		let template: Template
 
 		do {
+			log.debug("...loading template.")
+
   		let name = feedConfig.template ?? config.feedDefaults.template
   		let file = try File(path: config.templatesDir + "/" + name)
   		let buffer = try file.readAll(deadline: 30.seconds)
 			file.close()
 
+			log.trace("...template name: \(name)")
+
 			guard let string = String(bytes: buffer.bytes, encoding: .utf8) else {
-				log.error("Template \(file) could not be converted to string.")
+				log.error("Template \(name) could not be converted to string.")
 				return Response(status: .internalServerError,
 				                body: "Failed loading template.")
 			}
@@ -156,6 +169,8 @@ let router = BasicRouter { route in
 			return Response(status: .internalServerError,
 			                body: "Failed parsing feed template.")
 		}
+
+		log.debug("...building template context.")
 
 		let playlist: [MuttonChop.Context] = feed.playlist.map { item in
 
@@ -212,6 +227,8 @@ let router = BasicRouter { route in
 		let headers: Headers = [
 			"Content-Type": "application/rss+xml; charset=utf-8"
 		]
+
+		log.debug("...responding with rendered template.")
 
 		return Response(headers: headers, body: body)
 	}

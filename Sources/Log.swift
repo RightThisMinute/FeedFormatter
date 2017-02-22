@@ -25,7 +25,7 @@ public struct LogAppender : Appender {
 		guard levels.contains(event.level) else { return; }
 		
 		var entry = ""
-		
+
 		let date = Date(timeIntervalSince1970: Double(event.timestamp) ?? 0)
 			.asString(with: "yyyy-MM-dd'T'HH:mm:ss")
 		entry += ">>=\(date)=> "
@@ -34,7 +34,16 @@ public struct LogAppender : Appender {
 			let badLevels: Logger.Level = [.warning, .error, .fatal]
 			let (left, right) = badLevels.contains(event.level)
 				? ("|>", "<|") : ("", "")
-			
+
+			// Starting multiline messages on their own line is more readable and
+		  // helps them stand out from normal messages.
+			let newlineCount = "\(message)".characters
+				 .map({ $0 == "\n" ? 1 : 0 })
+				 .reduce(0) { $0 + $1 }
+			if newlineCount > 0 {
+				entry += "\n"
+			}
+
 			entry += "\(left) \(message) \(right) "
 		}
 		
