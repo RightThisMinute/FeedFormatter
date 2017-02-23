@@ -14,7 +14,7 @@ Currently only works with feeds (or "playlists") from [JW Platform](https://deve
 
 ### macOS ###
 
-[Install `swiftenv`.](https://swiftenv.fuller.li/en/latest/installation.html#via-a-git-clone).
+[Install `swiftenv`.](https://swiftenv.fuller.li/en/latest/installation.html#via-a-git-clone)
 
 ⚠️ With **homebrew** use:
 
@@ -22,10 +22,10 @@ Currently only works with feeds (or "playlists") from [JW Platform](https://deve
 brew install kylef/formulae/swiftenv --HEAD
 ```
 
-Install Swift 3.0.1:
+Install Swift 3.0.2:
 
 ```bash
-swiftenv install 3.0.1
+swiftenv install 3.0.2
 ```
 
 Clone this repo and run `swift build`. You can generate the Xcode project with:
@@ -44,7 +44,7 @@ _Only tested on Ubuntu 16.04._
 ```bash
 apt update
 apt install libcurl3 clang
-swiftenv install 3.0.1
+swiftenv install 3.0.2
 ```
 
 
