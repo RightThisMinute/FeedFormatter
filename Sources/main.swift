@@ -156,7 +156,7 @@ let router = BasicRouter { route in
 			/// crash in `CLibvenice` that I couldn't figure out how to get around.
 
 			let requestCompleted = Channel<Bool>()
-			let timeout = Date() - 30.seconds
+			let timeout = Date() + 30.seconds
 
 			every(50.milliseconds) { done in
 				if task.state == .completed {
