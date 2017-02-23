@@ -142,7 +142,8 @@ let router = BasicRouter { route in
 			var reqResponse: URLResponse? = nil
 			var reqError: Error? = nil
 
-			let task = URLSession.shared.dataTask(with: url) { data, response, error in
+			let session = URLSession(configuration: URLSessionConfiguration.default)
+			let task = session.dataTask(with: url) { data, response, error in
 				reqData = data
 				reqResponse = response
 				reqError = error
