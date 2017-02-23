@@ -2,12 +2,12 @@
 import Axis
 import File
 import Foundation
-import HTTPClient
 import HTTPServer
 import Mapper
 import MuttonChop
 import POSIX
 import Signals
+import Venice
 
 
 let cli = CLI()
@@ -134,38 +134,79 @@ let router = BasicRouter { route in
 			}
 		}
 
-
-		var providerResponse: Response
+		log.debug("\(req)requesting feed from provider: [GET \(url.absoluteString)]")
+		let bodyData: Data
 
 		do {
-			log.debug("\(req)requesting feed from provider: [GET \(url.absoluteString)]")
-			providerResponse = try Client(url: url).get(url.absoluteString)
-			
-		} catch {
-			log.error("Failed making request [GET \(url.absoluteString)].",
-			          error: error)
-			
-			return Response(status: .badGateway,
-			                body: "Failed retrieving data from provider.")
+			var reqData: Data? = nil
+			var reqResponse: URLResponse? = nil
+			var reqError: Error? = nil
+
+			let task = URLSession.shared.dataTask(with: url) { data, response, error in
+				reqData = data
+				reqResponse = response
+				reqError = error
+			}
+
+			task.resume()
+
+			/// The obvious solution would be to send to the channel in the
+			/// `URLSessions.shared.dataTask()` response handler, but that causes a
+			/// crash in `CLibvenice` that I couldn't figure out how to get around.
+
+			let requestCompleted = Channel<Bool>()
+			let timeout = Date() - 30.seconds
+
+			every(50.milliseconds) { done in
+				if task.state == .completed {
+					requestCompleted.send(true)
+					done()
+				}
+
+				if task.state == .canceling || Date() >= timeout {
+					requestCompleted.send(false)
+					done()
+				}
+			}
+
+			guard let completed = requestCompleted.receive(), completed else {
+				log.error("Request [GET \(url.absoluteString)] timed out.")
+				return Response(status: .gatewayTimeout,
+				                body: "The provider took too long to respond.")
+			}
+
+			guard reqError == nil else {
+				log.error("Failed making request [GET \(url.absoluteString)].",
+				          error: reqError!)
+				log.debug(reqResponse)
+				return Response(status: .badGateway,
+				                body: "Failed retrieving data from provider.")
+			}
+
+			guard reqData != nil else {
+				log.error("Provider returned no data for request [GET \(url.absoluteString)]")
+				log.debug(reqResponse)
+				return Response(status: .badGateway,
+				                body: "Failed retrieving data from provider.")
+			}
+
+			bodyData = reqData!
 		}
 
-		guard providerResponse.statusCode == 200 else {
-			log.error("Unexpected response \(providerResponse.status) from provider \(feedConfig.provider) with URL \(url.absoluteString).")
-			log.debug(feedConfig)
-			log.debug(providerResponse)
-
-			return Response(status: .badGateway,
-			                body: "Failed retrieving data from provider.")
-		}
 
 		let feed: JWFeed
 
 		do {
-  		let body = try providerResponse.body.becomeBuffer(deadline: 5.seconds)
+			guard let body = String(data: bodyData, encoding: .utf8) else {
+				log.error("Failed converting provider response to UTF8 string.")
+				log.debug(bodyData)
+				return Response(status: .badGateway,
+				                body: "Unexpected encoding from provider.")
+			}
 
-  		guard let map = try JSONMapParser().parse(body) else {
+  		guard let map = try JSONMapParser().parse(body.buffer) else {
 			  log.error("Unexpected data structure from provider.")
-			  log.debug(try String(buffer: body))
+			  log.debug(body)
   			return Response(status: .badGateway,
   			                body: "Unexpected data structure from provider.")
   		}
@@ -175,7 +216,7 @@ let router = BasicRouter { route in
 		} catch let error as JSONMapParserError {
 			log.error("Failed parsing JSON response from provider.",
 			          error: error)
-			log.debug(providerResponse)
+			log.debug(String(data: bodyData, encoding: .utf8))
 
 			return Response(status: .internalServerError,
 			                body: "The provider gave an unexpected response.")
