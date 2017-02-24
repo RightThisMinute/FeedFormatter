@@ -72,6 +72,7 @@ Signals.trap(signals: [.abrt, .alrm, .hup, .int, .kill, .quit, .term]){ sig in
 	exit(sig)
 }
 
+let urlSession = URLSession(configuration: URLSessionConfiguration.default)
 
 let responseCache: Cache<Response>?
 
@@ -142,8 +143,7 @@ let router = BasicRouter { route in
 			var reqResponse: URLResponse? = nil
 			var reqError: Error? = nil
 
-			let session = URLSession(configuration: URLSessionConfiguration.default)
-			let task = session.dataTask(with: url) { data, response, error in
+			let task = urlSession.dataTask(with: url) { data, response, error in
 				reqData = data
 				reqResponse = response
 				reqError = error
