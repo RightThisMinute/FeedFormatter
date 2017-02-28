@@ -40,7 +40,7 @@ struct JWItem {
 	let pubdate: Date
 	let sources: [JWSource]
 	let duration: UInt
-	let image: URL
+	let image: URL?
 	let tracks: [JWTrack]
 	let tags: [String]
 	let link: URL
@@ -65,18 +65,15 @@ extension JWItem : InMappable {
 		tags = (try mapper.map(from: .tags) as String).split(separator: ",")
 		link = try mapper.map(from: .link)
 
+		if let image: URL = try? mapper.map(from: .image) {
+			/// Use the largest available version of the thumbnails.
+			/// See https://developer.jwplayer.com/jw-platform/reference/v1/urls/thumbs.html
+			let pattern     = try Regex("-[0-9]+(\\.jpg)$", options: .extended)
+			let bigImageURL = image.absoluteString.replace(pattern, with: ".jpg")
+			self.image = try URL(string: bigImageURL) ?? mapper.map(from: .image)
 
-		/// Use the largest available version of the thumbnails.
-		/// See https://developer.jwplayer.com/jw-platform/reference/v1/urls/thumbs.html
-
-		let image: URL = try mapper.map(from: .image)
-		let pattern = try Regex("-[0-9]+(\\.jpg)$", options: .extended)
-		let bigImageURL = image.absoluteString.replace(pattern, with: ".jpg")
-
-		if let url = URL(string: bigImageURL) {
-			self.image = url
 		} else {
-			self.image = try mapper.map(from: .image)
+			self.image = nil
 		}
 
 		if let dict: [String: Map] = try? mapper.unsafe_map(from: .custom) {

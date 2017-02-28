@@ -102,16 +102,18 @@ extension ServerConfig : InMappable {
 struct FeedConfigDefaults {
 	let link: String
 	let template: String
+	let defaultImage: URL?
 }
 
 extension FeedConfigDefaults : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case link, template
+		case link, template, default_image
 	}
 
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
 		link = try mapper.map(from: .link)
 		template = try mapper.map(from: .template)
+		defaultImage = try? mapper.map(from: .default_image)
 	}
 }
 

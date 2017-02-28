@@ -285,13 +285,15 @@ let router = BasicRouter { route in
 			sourceFile["width"]  = .int(Int(source?.width ?? 0))
 			sourceFile["height"] = .int(Int(source?.height ?? 0))
 
+			let thumb: URL? = item.image ?? config.feedDefaults.defaultImage ?? nil
+
 			return [
 				"mediaID":     .string(item.mediaID),
 				"title":       .string(item.title),
 				"description": .string(item.description ?? ""),
 				"pubdate":     .string(pubdate),
 				"source":			 .dictionary(sourceFile),
-				"thumbnail":   .string(item.image.absoluteString),
+				"thumbnail":   .string(thumb?.absoluteString ?? ""),
 				"link":        .string(item.link.absoluteString),
 				"custom":      .dictionary(custom),
 			]

@@ -22,9 +22,11 @@ templates_dir: ./
 # defaults.
 feed_defaults:
   # <link> value.
-  link: "http://www.example.com"
+  link: "https://www.example.com"
   # Name of the template in `template_dir` to use for this feed.
   template: example.mrss.xml
+  # A URL to an image to use if no image is present for an item. (optional)
+  default_image: "https://www.example.com/default.jpg"
 
 feeds:
     # Used in the URL.
