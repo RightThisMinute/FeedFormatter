@@ -1,0 +1,138 @@
+{
+  "autoPin": true,
+  "pins": [
+    {
+      "package": "Axis",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/Axis.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "CHTTPParser",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/CHTTPParser.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "CLibvenice",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/CLibvenice.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "COpenSSL",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/COpenSSL.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "CPOSIX",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/CPOSIX.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "CYAJL",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/CYAJL.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "CommandLine",
+      "reason": null,
+      "repositoryURL": "https://github.com/RightThisMinute/CommandLine.git",
+      "version": "3.0.0"
+    },
+    {
+      "package": "File",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/File.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "HTTP",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/HTTP.git",
+      "version": "0.14.3"
+    },
+    {
+      "package": "HTTPFile",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/HTTPFile.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "HTTPServer",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/HTTPServer.git",
+      "version": "0.14.4"
+    },
+    {
+      "package": "IP",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/IP.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "Mapper",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/Mapper.git",
+      "version": "0.14.2"
+    },
+    {
+      "package": "MuttonChop",
+      "reason": null,
+      "repositoryURL": "https://github.com/Danappelxx/MuttonChop.git",
+      "version": "0.2.0"
+    },
+    {
+      "package": "OpenSSL",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/OpenSSL.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "POSIX",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/POSIX.git",
+      "version": "0.14.1"
+    },
+    {
+      "package": "Reflection",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/Reflection.git",
+      "version": "0.14.3"
+    },
+    {
+      "package": "Signals",
+      "reason": null,
+      "repositoryURL": "https://github.com/IBM-Swift/BlueSignals.git",
+      "version": "0.9.45"
+    },
+    {
+      "package": "TCP",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/TCP.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "Venice",
+      "reason": null,
+      "repositoryURL": "https://github.com/Zewo/Venice.git",
+      "version": "0.14.0"
+    },
+    {
+      "package": "YAMLMapper",
+      "reason": null,
+      "repositoryURL": "https://github.com/RightThisMinute/YAMLMapper.git",
+      "version": "0.1.3"
+    },
+    {
+      "package": "Yaml",
+      "reason": null,
+      "repositoryURL": "https://github.com/behrang/YamlSwift.git",
+      "version": "3.1.0"
+    }
+  ],
+  "version": 1
+}
