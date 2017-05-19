@@ -39,3 +39,6 @@ feeds:
     provider: jw
     # The ID of the feed at the provider.
     provider_id: t5t9CjMF
+    # The preprocessor to be used as defined in Config.swift. If left blank,
+    # none are used.
+    preprocessor: LightWorkers

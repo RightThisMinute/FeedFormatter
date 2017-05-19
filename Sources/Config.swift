@@ -9,6 +9,7 @@
 import Foundation
 import File
 import Mapper
+import MuttonChop
 import Yaml
 import YAMLMapper
 
@@ -28,6 +29,7 @@ struct Config {
 
 	enum Error : Swift.Error {
 		case unexpectedEncoding(String)
+		case unknownPreprocessor
 	}
 }
 
@@ -131,6 +133,7 @@ struct FeedConfig {
 	}
 
 	let template: String?
+	let preprocessor: ((MuttonChop.Context, JWItem) -> MuttonChop.Context)?
 }
 
 enum Provider : String {
@@ -143,7 +146,8 @@ enum Provider : String {
 
 extension FeedConfig : InMappable {
 	enum MappingKeys : String, Mapper.IndexPathElement {
-		case id, title, description, link, provider, provider_id, template
+		case id, title, description, link, provider, provider_id, template,
+		     preprocessor
 	}
 
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
@@ -154,5 +158,14 @@ extension FeedConfig : InMappable {
 		provider = try mapper.map(from: .provider)
 		providerID = try mapper.map(from: .provider_id)
 		template = try? mapper.map(from: .template)
+
+		if let name: String = try? mapper.map(from: .preprocessor) {
+			switch name {
+			default:
+				throw Config.Error.unknownPreprocessor
+			}
+		} else {
+			preprocessor = nil
+		}
 	}
 }

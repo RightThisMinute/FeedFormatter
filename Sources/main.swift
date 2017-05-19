@@ -281,13 +281,13 @@ let router = BasicRouter { route in
 			/// in Xcode and to take ~225 seconds building via the command line.
 			/// Assigning these values afterwards completely avoids the issue.
 			///
-			/// This was found with Xcode 8.1 and Swift 3.0 release.
+			/// This was found with Xcode 8.1 and Swift 3.0-RELEASE.
 			sourceFile["width"]  = .int(Int(source?.width ?? 0))
 			sourceFile["height"] = .int(Int(source?.height ?? 0))
 
 			let thumb: URL? = item.image ?? config.feedDefaults.defaultImage ?? nil
 
-			return [
+			let context: MuttonChop.Context = [
 				"mediaID":     .string(item.mediaID),
 				"title":       .string(item.title),
 				"description": .string(item.description ?? ""),
@@ -297,6 +297,12 @@ let router = BasicRouter { route in
 				"link":        .string(item.link.absoluteString),
 				"custom":      .dictionary(custom),
 			]
+
+			if let preprocessor = feedConfig.preprocessor {
+				return preprocessor(context, item)
+			}
+
+			return context
 		}
 
 		let context: MuttonChop.Context = [
