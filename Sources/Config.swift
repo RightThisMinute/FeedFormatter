@@ -161,7 +161,7 @@ extension FeedConfig : InMappable {
 
 		if let name: String = try? mapper.map(from: .preprocessor) {
 			switch name {
-			case "LightWokers":
+			case "LightWorkers":
 				preprocessor = LightWorkersPreprocessor.process
 			default:
 				throw Config.Error.unknownPreprocessor
