@@ -18,6 +18,8 @@ extension Date {
 	///
 	/// - parameter format: The date format string that would normall be set 
 	///   `DateFormatter().dateFormat`.
+	///
+	/// [Format guide](http://www.unicode.org/reports/tr35/tr35-31/tr35-dates.html#Date_Format_Patterns)
 	
 	public func asString(with format: DateFormat) -> String {
 		let formatter = DateFormatter()
