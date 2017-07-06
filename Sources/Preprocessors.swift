@@ -51,3 +51,14 @@ struct LightWorkersPreprocessor {
 		return context
 	}
 }
+
+struct MailChimpPreprocessor {
+	static func process(context: Context, with item: JWItem) -> Context {
+		// Must be RFC 822
+		let pubdate = item.pubdate.asString(with: "EEE, dd MMM yyyy HH:mm:ss ZZZ")
+
+		var context = context
+		context["pubdate"] = .string(pubdate)
+		return context
+	}
+}

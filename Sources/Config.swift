@@ -163,6 +163,8 @@ extension FeedConfig : InMappable {
 			switch name {
 			case "LightWorkers":
 				preprocessor = LightWorkersPreprocessor.process
+			case "MailChimp":
+				preprocessor = MailChimpPreprocessor.process
 			default:
 				throw Config.Error.unknownPreprocessor
 			}
