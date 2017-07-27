@@ -6,6 +6,8 @@ import Foundation
 import MuttonChop
 
 struct LightWorkersPreprocessor {
+	static let OOYALA_MAX_DESC_MAX_LENGTH = 156
+
 	static func process(context: Context, with item: JWItem) -> Context {
 		let pubdate = item.pubdate.asString(with: "M/dd/yyyy")
 
@@ -41,7 +43,20 @@ struct LightWorkersPreprocessor {
 			quality = "HD"
 		}
 
+		// Ooyala (the system LightWorkers use) can't handle descriptions longer than
+		// 156 characters (that's what they said, but doesn't seem accurate as they
+		// were fine with other descriptions being longer than that...).
+		var desc = item.description ?? ""
+		if desc.characters.count > OOYALA_MAX_DESC_MAX_LENGTH {
+			let offset = OOYALA_MAX_DESC_MAX_LENGTH - 2
+			desc = desc
+				.substring(to: desc.index(desc.startIndex, offsetBy: offset))
+				.trim()
+				+ "…"
+		}
+
 		var context = context
+		context["description"]  = .string(desc)
 		context["creationDate"] = .string(pubdate)
 		context["publishDate"]  = .string(pubdate)
 		context["duration"]     = .string(duration)
