@@ -261,6 +261,10 @@ let router = BasicRouter { route in
 				with: "yyyy-MM-dd'T'HH:mm:ssZZZZZ"
 			)
 
+			let rfc822Pubdate = item.pubdate.asString(
+				with: "EEE, dd MMM yyyy HH:mm:ss ZZZ"
+			)
+
 			let custom: [String: Map] = item.custom.map{ (key, value) in
 				return (key, .string(value))
 			}
@@ -292,6 +296,7 @@ let router = BasicRouter { route in
 				"title":       .string(item.title),
 				"description": .string(item.description ?? ""),
 				"pubdate":     .string(pubdate),
+				"rfc822date":  .string(rfc822Pubdate),
 				"source":			 .dictionary(sourceFile),
 				"thumbnail":   .string(thumb?.absoluteString ?? ""),
 				"link":        .string(item.link.absoluteString),
