@@ -102,11 +102,16 @@ extension JWSource : InMappable {
 
 	init<Source : InMap>(mapper: InMapper<Source, MappingKeys>) throws {
 		label    = try? mapper.map(from: .label)
-		type     = try  mapper.map(from: .type)
 		file     = try  mapper.map(from: .file)
 		width    = try? mapper.map(from: .width)
 		height   = try? mapper.map(from: .height)
 		duration = try? mapper.map(from: .duration)
+
+		if let type: String = try? mapper.map(from: .type) {
+			self.type = type
+		} else {
+			self.type = "<passthrough>"
+		}
 	}
 
 }
